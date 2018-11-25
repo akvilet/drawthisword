@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+    <style>
+        canvas {
+            border-color: black;
+            border-width: 1;
+        }
+    </style>
+  </head>
+  <body class="ttl">
+    <div class="thank-you-area dn f1 black-70 items-center justify-center mw-50">
+      <div class="pa7 mt7">
+        Thank You!
+      </div>
+    </div>
+    <div class="draw-area flex justify-between items-center">
+      <div class="center pa6 f1 flex flex-column items-center black-70">
+        <div class="word">{{word}}</div>
+        <button class="create-image dn pointer dim ph3 pv2 mt4 f3 bg-white black-70 ba b--black-70 br2">submit</button>
+      </div>
+      <div class="canvas bl">
+        <div class="flex items-center justify-center">
+          <button class="brush-pen pointer dim ph3 pv2 mt4 f3 bg-white black-70 ba b--black-70 br2">pen</button>
+          <button class="brush-eraser pointer dim ph3 pv2 mt4 ml2 f3 bg-white black-70 ba b--black-70 br2">eraser</button>
+        </div>
+        <div id="canvas-container" class="bl">
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
+    <script>
+      window.__BRUSH__ = 'PEN';
+      var hasDrawn = false;
+      function setBrush() {
+        if (window.__BRUSH__ === 'ERASER') {
+            stroke('rgba(255,255,255)'); // white
+            strokeWeight(20); // big
+        } else { // PEN
+            stroke(0); // black
+            strokeWeight(1); // small
+        }
+      }
+      function setup() {
+        var cnv = createCanvas(displayWidth/2, displayHeight);
+        background(255,255,255);
+        cnv.parent('canvas-container');
+        strokeWeight(1);
+        stroke(0);
+      }
+
+      function draw() {
+        setBrush();
+        if (mouseIsPressed === true) {
+          if (!hasDrawn) {
+            $('.create-image').removeClass('dn');
+          }
+          line(mouseX, mouseY, pmouseX, pmouseY);
+        }
+      }
+    </script>
+    <script>
+      $(document).ready(function() {
+        function uploadImage(img) {
+          var word = $('.word').text();
+	  $('.create-image').text('submitting...');
+	  $('.create-image').prop('disabled', true);
+          $.ajax({
+            url: '/',
+            type: 'POST',
+            data: {img: img, word: word},
+            success: function() {
+              $('.draw-area').removeClass('flex');
+              $('.draw-area').addClass('dn');
+              $('.thank-you-area').removeClass('dn');
+              $('.thank-you-area').addClass('flex');
+              console.log('success');
+	      $('.create-image').text('submit');
+            },
+            error: function() {
+              console.log('error');
+	      $('.create-image').text('could not submit :(');
+            }
+          });
+        }
+        $('.create-image').click(function() {
+          var canvas = document.getElementById("defaultCanvas0");
+          var img = canvas.toDataURL("image/png");
+          //document.write('<img src="'+img+'"/>');
+          uploadImage(img);
+        });
+        $('.brush-pen').click(function() {
+          window.__BRUSH__ = 'PEN';
+        });
+        $('.brush-eraser').click(function() {
+          window.__BRUSH__ = 'ERASER';
+        });
+      });
+    </script>
+  </body>
+</html>
