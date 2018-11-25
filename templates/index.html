@@ -6,6 +6,9 @@
             border-color: black;
             border-width: 1;
         }
+        button {
+          outline: none;
+        }
     </style>
   </head>
   <body class="ttl">
@@ -21,8 +24,8 @@
       </div>
       <div class="canvas bl">
         <div class="flex items-center justify-center">
-          <button class="brush-pen pointer dim ph3 pv2 mt4 f3 bg-white black-70 ba b--black-70 br2">pen</button>
-          <button class="brush-eraser pointer dim ph3 pv2 mt4 ml2 f3 bg-white black-70 ba b--black-70 br2">eraser</button>
+          <button class="brush-pen pointer ph3 pv2 mt4 f3 bg-white black-70 ba b--black-70 br2">pen</button>
+          <button class="brush-eraser pointer ph3 pv2 mt4 ml2 f3 bg-white black-70 ba b--black-70 br2">eraser</button>
         </div>
         <div id="canvas-container" class="bl">
         </div>
@@ -65,8 +68,8 @@
       $(document).ready(function() {
         function uploadImage(img) {
           var word = $('.word').text();
-	  $('.create-image').text('submitting...');
-	  $('.create-image').prop('disabled', true);
+          $('.create-image').text('submitting...');
+          $('.create-image').prop('disabled', true);
           $.ajax({
             url: '/',
             type: 'POST',
@@ -77,11 +80,11 @@
               $('.thank-you-area').removeClass('dn');
               $('.thank-you-area').addClass('flex');
               console.log('success');
-	      $('.create-image').text('submit');
+              $('.create-image').text('submit');
             },
             error: function() {
               console.log('error');
-	      $('.create-image').text('could not submit :(');
+              $('.create-image').text('could not submit :(');
             }
           });
         }
@@ -93,11 +96,23 @@
         });
         $('.brush-pen').click(function() {
           window.__BRUSH__ = 'PEN';
+          focus($(this));
+          unfocus($('.brush-eraser'));
         });
         $('.brush-eraser').click(function() {
           window.__BRUSH__ = 'ERASER';
+          focus($(this));
+          unfocus($('.brush-pen'));
         });
       });
+      function focus(selection) {
+          $(selection).removeClass('black-70 bg-white');
+          $(selection).addClass('bg-black-70 white');
+      }
+      function unfocus(selection) {
+          $(selection).removeClass('bg-black-70 white');
+          $(selection).addClass('black-70 bg-white');
+      }
     </script>
   </body>
 </html>
