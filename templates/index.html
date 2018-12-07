@@ -1,10 +1,18 @@
 <html>
   <head>
-    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+    <link rel="stylesheet" href="/static/css/tachyons.min.css"/>
     <style>
+        html, body {
+          margin: 0;
+          height: 100%;
+          overflow: hidden;
+        }
+        body {
+          position: relative
+        }
         canvas {
-            border-color: black;
-            border-width: 1;
+          border-color: black;
+          border-width: 1;
         }
         button {
           outline: none;
@@ -17,25 +25,29 @@
         Thank You!
       </div>
     </div>
-    <div class="draw-area flex justify-between items-center">
-      <div class="center pa6 f1 flex flex-column items-center black-70">
-        <div class="word">{{word}}</div>
-        <button class="create-image dn pointer dim ph3 pv2 mt4 f3 bg-white black-70 ba b--black-70 br2">submit</button>
+    <div class="begin-splash black-70 flex items-center justify-center h-100 tc">
+      <div class="flex flex-column">
+        <span class="f3">draw this word</span>
+        <div class="f-subheadline lh-solid mt2">{{word}}</div>
+        <button class="begin-draw pointer dim mt5 ph3 pv2 f3 bg-white black-70 ba b--black-70 br2">begin</button>
       </div>
-      <div class="canvas bl">
+    </div>
+    <div class="draw-area dn justify-center items-center">
+      <div class="canvas">
         <div class="flex items-center justify-center">
           <button class="brush-pen pointer ph3 pv2 mt4 f3 bg-white black-70 ba b--black-70 br2">pen</button>
           <button class="brush-eraser pointer ph3 pv2 mt4 ml2 f3 bg-white black-70 ba b--black-70 br2">eraser</button>
         </div>
-        <div id="canvas-container" class="bl">
-        </div>
+        <div id="canvas-container"></div>
       </div>
+      <button class="absolute bottom-2 create-image dn pointer dim ph3 pv2 mt4 f3 bg-white black-70 ba b--black-70 br2">submit</button>
     </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
+    <script src="/static/js/jquery-3.3.1.min.js">
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
+    <script src="/static/js/p5.min.js"></script>
     <script>
       window.__BRUSH__ = 'PEN';
+      window.__IS_DRAWING__ = false;
       var hasDrawn = false;
       function setBrush() {
         if (window.__BRUSH__ === 'ERASER') {
@@ -47,7 +59,7 @@
         }
       }
       function setup() {
-        var cnv = createCanvas(displayWidth/2, displayHeight);
+        var cnv = createCanvas(displayWidth, displayHeight);
         background(255,255,255);
         cnv.parent('canvas-container');
         strokeWeight(1);
@@ -56,16 +68,32 @@
 
       function draw() {
         setBrush();
-        if (mouseIsPressed === true) {
-          if (!hasDrawn) {
+        if (mouseIsPressed) {
+          if (!hasDrawn && mouseX !== Infinity && mouseY !== Infinity) {
             $('.create-image').removeClass('dn');
           }
           line(mouseX, mouseY, pmouseX, pmouseY);
         }
       }
+
+      // disable finger scroll when drawing
+      function touchStarted() {
+        if (window.__IS_DRAWING__) {
+          return false;
+        }
+        return true;
+      }
     </script>
     <script>
       $(document).ready(function() {
+        function show(selector, showClass) {
+          $(selector).removeClass('dn');
+          $(selector).addClass(showClass);
+        }
+        function hide(selector, showClass) {
+          $(selector).addClass('dn');
+          $(selector).removeClass(showClass);
+        }
         function uploadImage(img) {
           var word = $('.word').text();
           $('.create-image').text('submitting...');
@@ -75,10 +103,9 @@
             type: 'POST',
             data: {img: img, word: word},
             success: function() {
-              $('.draw-area').removeClass('flex');
-              $('.draw-area').addClass('dn');
-              $('.thank-you-area').removeClass('dn');
-              $('.thank-you-area').addClass('flex');
+              window.__IS_DRAWING__ = false;
+              hide('.draw-area', 'flex')
+              show('.thank-you-area', 'flex')
               console.log('success');
               $('.create-image').text('submit');
             },
@@ -89,10 +116,14 @@
           });
         }
         focus($('.brush-pen'));
+        $('.begin-draw').click(function() {
+          window.__IS_DRAWING__ = true;
+          hide('.begin-splash', 'flex');
+          show('.draw-area', 'flex');
+        });
         $('.create-image').click(function() {
           var canvas = document.getElementById("defaultCanvas0");
           var img = canvas.toDataURL("image/png");
-          //document.write('<img src="'+img+'"/>');
           uploadImage(img);
         });
         $('.brush-pen').click(function() {

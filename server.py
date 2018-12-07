@@ -1,6 +1,6 @@
-from base64 import b64decode
-
 import os
+import sys
+from base64 import b64decode
 from datetime import datetime
 import time
 from flask import Flask, render_template, flash, request, redirect, url_for
@@ -37,4 +37,9 @@ def index():
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.run(host='0.0.0.0', port=7070)
+    debug = False
+    if len(sys.argv) == 2:
+        if sys.argv[1] == 'debug':
+            debug = True
+
+    app.run(host='0.0.0.0', port=7070, debug=debug)
