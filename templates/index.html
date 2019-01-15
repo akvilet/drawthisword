@@ -17,9 +17,15 @@
         button {
           outline: none;
         }
+        .lock-screen {
+          height: 100%;
+          overflow: hidden;
+          width: 100%;
+          position: fixed;
+        }
     </style>
   </head>
-  <body class="ttl">
+  <body class="ttl lock-screen">
     <div class="thank-you-area dn f1 black-70 items-center justify-center mw-50">
       <div class="pa7 mt7">
         Thank You!
@@ -59,7 +65,7 @@
         }
       }
       function setup() {
-        var cnv = createCanvas(displayWidth, displayHeight);
+        var cnv = createCanvas(window.innerWidth, window.innerHeight);
         background(255,255,255);
         cnv.parent('canvas-container');
         strokeWeight(1);
@@ -76,13 +82,6 @@
         }
       }
 
-      // disable finger scroll when drawing
-      function touchStarted() {
-        if (window.__IS_DRAWING__) {
-          return false;
-        }
-        return true;
-      }
     </script>
     <script>
       $(document).ready(function() {
