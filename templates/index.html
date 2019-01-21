@@ -13,6 +13,7 @@
         canvas {
           border-color: black;
           border-width: 1;
+          overscroll-behavior-y: none; /* disable overscrolling in chrome */
         }
         button {
           outline: none;
@@ -34,7 +35,7 @@
     <div class="begin-splash black-70 flex items-center justify-center h-100 tc">
       <div class="flex flex-column">
         <span class="f3">draw this word</span>
-        <div class="f-subheadline lh-solid mt2">{{word}}</div>
+        <div class="word f-subheadline lh-solid mt2">{{word}}</div>
         <button class="begin-draw pointer dim mt5 ph3 pv2 f3 bg-white black-70 ba b--black-70 br2">begin</button>
       </div>
     </div>
