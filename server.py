@@ -1,4 +1,5 @@
 import os
+import errno
 import sys
 from base64 import b64decode
 from datetime import datetime
@@ -15,6 +16,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 SAVE_DIR = './uploads/'
 
 WORD = 'phone'
+
+def ensure_upload_dir():
+    try:
+        os.makedirs(SAVE_DIR)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
 # saves a data uri as a png image to a file
 def save_image(word, data):
@@ -35,6 +43,7 @@ def index():
         return render_template('index.html', word=WORD)
 
 if __name__ == '__main__':
+    ensure_upload_dir()
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
     debug = False
